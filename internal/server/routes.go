@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/predsun/dashboard/internal/models"
-	"github.com/predsun/dashboard/internal/server/handlers"
 	"github.com/predsun/dashboard/internal/store"
 )
 
@@ -81,7 +80,7 @@ func (s *Server) routes(staticFS fs.FS) http.Handler {
 }
 
 // setupComplete checks the persisted flag. Errors are treated as
-// "not complete" — the wizard will overwrite the row on success and any
+// "not complete" 鈥?the wizard will overwrite the row on success and any
 // permanent DB problem will be surfaced at /readyz.
 func (s *Server) setupComplete() bool {
 	v, _ := (store.Settings{DB: s.db}).GetOrDefault(context.Background(), models.SettingSetupComplete, "0")
