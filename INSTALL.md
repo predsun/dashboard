@@ -20,12 +20,12 @@ The script:
 
 1. Detects your CPU architecture (amd64 / arm64); aborts on anything else.
 2. Resolves `latest` to a specific tag via the GitHub API.
-3. Downloads the binary, `SHA256SUMS`, and `SHA256SUMS.sig`.
-4. **Verifies the cosign signature on `SHA256SUMS`** (keyless, against the project's GitHub Actions OIDC identity). Aborts if `cosign` isn't installed — pass `--skip-cosign` only if you've accepted the risk.
+3. Downloads the binary, `SHA256SUMS`, and `SHA256SUMS.bundle`.
+4. **Verifies the cosign signature on `SHA256SUMS`** (keyless, against the project's GitHub Actions OIDC identity). Aborts if `cosign` isn't installed 鈥?pass `--skip-cosign` only if you've accepted the risk.
 5. **Verifies the binary's SHA256 against `SHA256SUMS`**. Aborts on mismatch.
 6. Creates a `dashboard` system user (`useradd --system --no-create-home --shell /usr/sbin/nologin`) if absent.
 7. Installs the binary to `/usr/local/bin/dashboard` (root-owned, `0755`).
-8. Creates `/var/lib/dashboard` (`0750`, `dashboard:dashboard`) if absent — preserves ownership on re-runs.
+8. Creates `/var/lib/dashboard` (`0750`, `dashboard:dashboard`) if absent 鈥?preserves ownership on re-runs.
 9. Installs `/etc/systemd/system/dashboard.service`, runs `daemon-reload`, enables the unit.
 10. Restarts the service if already running.
 
@@ -78,7 +78,7 @@ Then `systemctl restart dashboard`.
 
 You almost certainly want a reverse proxy. The binary listens on plain HTTP by default; the reverse proxy terminates TLS and forwards.
 
-### Caddy (recommended — handles certs automatically)
+### Caddy (recommended 鈥?handles certs automatically)
 
 Drop `deploy/Caddyfile.example` at `/etc/caddy/Caddyfile`, replace the hostname, and:
 
@@ -109,7 +109,7 @@ DASHBOARD_ACME_HOSTS=apps.example.com
 DASHBOARD_LISTEN_ADDR=:443
 ```
 
-You'll also need to grant the binary permission to bind to ports below 1024. The systemd unit ships with `CapabilityBoundingSet=` empty — edit `/etc/systemd/system/dashboard.service` and add:
+You'll also need to grant the binary permission to bind to ports below 1024. The systemd unit ships with `CapabilityBoundingSet=` empty 鈥?edit `/etc/systemd/system/dashboard.service` and add:
 
 ```ini
 CapabilityBoundingSet=CAP_NET_BIND_SERVICE
@@ -122,7 +122,7 @@ Then `systemctl daemon-reload && systemctl restart dashboard`. The unit must als
 
 ## Hardened systemd unit
 
-The unit ships with most of the sandbox flags systemd offers. Run `systemd-analyze security dashboard.service` to see the score; it should land in the "OK" (≤ 2.0) band.
+The unit ships with most of the sandbox flags systemd offers. Run `systemd-analyze security dashboard.service` to see the score; it should land in the "OK" (鈮?2.0) band.
 
 ```
 ProtectSystem=strict           # everything read-only except ReadWritePaths
@@ -153,7 +153,7 @@ Two ways. Use both for belt-and-suspenders.
 
 While the service is running, sign in and visit `/api/export` (or hit the export button in the UI). The downloaded JSON excludes secrets (session/CSRF keys) by default. Add `?include_secrets=1` for a self-contained restore that won't invalidate existing sessions.
 
-Restore with `POST /api/import` (uploads the JSON via the UI). Imports add to the current dashboard rather than replacing it — categories merge by name, apps land at the end of their respective groups.
+Restore with `POST /api/import` (uploads the JSON via the UI). Imports add to the current dashboard rather than replacing it 鈥?categories merge by name, apps land at the end of their respective groups.
 
 ### 2. SQLite file backup
 
@@ -204,7 +204,7 @@ sudo rm /etc/systemd/system/dashboard.service
 sudo rm /usr/local/bin/dashboard
 sudo systemctl daemon-reload
 
-# Optional — irreversible:
+# Optional 鈥?irreversible:
 sudo rm -rf /var/lib/dashboard
 sudo userdel dashboard
 ```
