@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # dashboard installer. Re-runnable: invoke again with --version vX.Y.Z to
-# upgrade. Aborts on checksum mismatch — never installs an unverified binary.
+# upgrade. Aborts on checksum mismatch 鈥?never installs an unverified binary.
 #
 # Usage:
 #   curl -fsSL https://github.com/predsun/dashboard/releases/latest/download/install.sh | sudo bash
@@ -82,19 +82,19 @@ curl -fsSL -o "$TMP/SHA256SUMS" "${BASE_URL}/SHA256SUMS"
 
 if [[ $SKIP_COSIGN -eq 0 ]]; then
   if command -v cosign >/dev/null 2>&1; then
-    info "downloading cosign signature"
-    curl -fsSL -o "$TMP/SHA256SUMS.sig" "${BASE_URL}/SHA256SUMS.sig"
+    info "downloading cosign bundle"
+    curl -fsSL -o "$TMP/SHA256SUMS.bundle" "${BASE_URL}/SHA256SUMS.bundle"
     # Keyless verification: trusts the GitHub Actions OIDC identity that
     # signed the release. Identity values match release.yml.
     info "verifying cosign signature (keyless)"
     cosign verify-blob \
       --certificate-identity-regexp "^https://github.com/${REPO}/" \
       --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
-      --signature "$TMP/SHA256SUMS.sig" \
+      --bundle "$TMP/SHA256SUMS.bundle" \
       "$TMP/SHA256SUMS" \
       || err "cosign signature verification failed"
   else
-    echo "warning: cosign not installed — signature not verified." >&2
+    echo "warning: cosign not installed 鈥?signature not verified." >&2
     echo "         install cosign or rerun with --skip-cosign to acknowledge." >&2
     err "aborting; install cosign or pass --skip-cosign"
   fi
@@ -163,7 +163,7 @@ if systemctl is-active --quiet dashboard.service 2>/dev/null; then
   info "restarting dashboard.service"
   systemctl restart dashboard.service
 else
-  info "service is not running yet — run: systemctl start dashboard"
+  info "service is not running yet 鈥?run: systemctl start dashboard"
 fi
 
 cat <<EOF
@@ -177,6 +177,6 @@ Next steps:
 
 Then visit http://<your-host>:8080/setup to create the admin account.
 
-For HTTPS, terminate TLS with Caddy or nginx — examples are in the repo's
+For HTTPS, terminate TLS with Caddy or nginx 鈥?examples are in the repo's
 deploy/ directory.
 EOF
