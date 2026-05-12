@@ -1,0 +1,38 @@
+{{define "title"}}Sign in · dashboard{{end}}
+
+{{define "content"}}
+<main class="flex min-h-screen items-center justify-center p-6">
+  <form method="post" action="/login"
+        class="w-full max-w-sm space-y-6 rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-200 transition dark:bg-slate-900 dark:ring-slate-800">
+    <header class="space-y-1">
+      <h1 class="text-2xl font-semibold tracking-tight">Sign in</h1>
+      <p class="text-sm text-slate-500 dark:text-slate-400">Welcome back.</p>
+    </header>
+
+    <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+
+    {{with .Data.Error}}
+      <div class="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700 ring-1 ring-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:ring-rose-900" role="alert">
+        {{.}}
+      </div>
+    {{end}}
+
+    <label class="block space-y-1">
+      <span class="text-sm font-medium">Username</span>
+      <input name="username" required autocomplete="username" autofocus
+             class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:focus:border-slate-500 dark:focus:ring-slate-700">
+    </label>
+
+    <label class="block space-y-1">
+      <span class="text-sm font-medium">Password</span>
+      <input name="password" type="password" required autocomplete="current-password"
+             class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:focus:border-slate-500 dark:focus:ring-slate-700">
+    </label>
+
+    <button type="submit"
+            class="w-full rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white motion-reduce:transition-none">
+      Sign in
+    </button>
+  </form>
+</main>
+{{end}}

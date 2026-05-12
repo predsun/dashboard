@@ -1,0 +1,35 @@
+{{define "base.html"}}<!doctype html>
+<html lang="en" class="h-full" x-data="{ theme: localStorage.getItem('theme') || 'auto' }"
+      x-init="applyTheme(theme)"
+      :class="effectiveTheme(theme) === 'dark' ? 'dark' : ''">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{{block "title" .}}dashboard{{end}}</title>
+  <link rel="stylesheet" href="{{asset "css/output.css"}}">
+  <link rel="icon" type="image/svg+xml" href="{{asset "icons/default-app.svg"}}">
+  <script nonce="{{.Nonce}}">
+    window.__CSRF__ = {{.CSRFToken}};
+    function effectiveTheme(t) {
+      if (t === 'auto') {
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      return t;
+    }
+    function applyTheme(t) {
+      document.documentElement.classList.toggle('dark', effectiveTheme(t) === 'dark');
+    }
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+      const saved = localStorage.getItem('theme') || 'auto';
+      if (saved === 'auto') applyTheme('auto');
+    });
+  </script>
+  <script src="{{asset "js/alpine.min.js"}}" defer></script>
+  <script src="{{asset "js/htmx.min.js"}}" defer></script>
+  <script src="{{asset "js/sortable.min.js"}}" defer></script>
+  <script src="{{asset "js/app.js"}}" defer></script>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-900 transition-colors duration-200 dark:bg-slate-950 dark:text-slate-100 motion-reduce:transition-none">
+  {{block "content" .}}{{end}}
+</body>
+</html>{{end}}

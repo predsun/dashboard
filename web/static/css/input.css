@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Reduced-motion users get instant transitions globally; individual
+   elements still call out `motion-reduce:transition-none` for clarity. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0ms !important;
+    animation-duration: 0ms !important;
+  }
+}
+
+/* Glassmorphism opt-in: applies a translucent backdrop blur to tiles when the
+   user enables the toggle in settings (M9). Off by default. */
+.glassy [data-app-id] {
+  background-color: rgb(255 255 255 / 0.6);
+  backdrop-filter: blur(10px);
+}
+.glassy.dark [data-app-id],
+.dark .glassy [data-app-id] {
+  background-color: rgb(15 23 42 / 0.55);
+}

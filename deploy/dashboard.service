@@ -1,0 +1,74 @@
+[Unit]
+Description=dashboard — self-hosted application launcher
+Documentation=https://github.com/predsun/dashboard
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/dashboard
+Restart=on-failure
+RestartSec=5s
+
+# --- Identity ---------------------------------------------------------------
+# Bound to the dashboard system user created by scripts/install.sh.
+# DynamicUser is *not* used because the data dir persists across restarts and
+# needs stable ownership.
+User=dashboard
+Group=dashboard
+DynamicUser=no
+
+# --- Filesystem isolation ---------------------------------------------------
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/dashboard
+
+# --- Privilege boundaries ---------------------------------------------------
+NoNewPrivileges=true
+# Empty CapabilityBoundingSet means the process drops *all* Linux capabilities.
+# If you bind to a port below 1024 instead of using a reverse proxy, replace
+# the line below with:
+#   CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+#   AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=
+
+# --- Process & syscall hardening --------------------------------------------
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+ProtectProc=invisible
+ProcSubset=pid
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
+
+# --- Resources --------------------------------------------------------------
+# Keeps a runaway upload or query from exhausting the host.
+LimitNOFILE=4096
+TasksMax=256
+
+# --- Environment ------------------------------------------------------------
+# Override defaults via /etc/dashboard.env (chmod 600, root-owned). The install
+# script does not create this file; ship sensible defaults in the binary and
+# let operators add overrides only when needed.
+EnvironmentFile=-/etc/dashboard.env
+
+# --- Logging ----------------------------------------------------------------
+# slog writes JSON to stdout; journald captures and tags it.
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=dashboard
+
+[Install]
+WantedBy=multi-user.target

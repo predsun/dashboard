@@ -1,0 +1,59 @@
+{{define "_categories_editor.html"}}
+<div x-data="categoriesEditor()"
+     x-show="open"
+     @open-categories-editor.window="onOpen()"
+     @keydown.escape.window="open && close()"
+     x-transition.opacity.duration.150ms
+     class="fixed inset-0 z-30 flex items-start justify-end bg-slate-900/30 p-0 backdrop-blur-sm"
+     style="display: none">
+  <aside @click.away="close()"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="translate-x-full"
+         x-transition:enter-end="translate-x-0"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="translate-x-0"
+         x-transition:leave-end="translate-x-full"
+         class="h-full w-full max-w-sm overflow-y-auto bg-white p-6 shadow-xl ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
+    <header class="mb-5 flex items-center justify-between">
+      <h2 class="text-lg font-semibold">Categories</h2>
+      <button type="button" @click="close()" aria-label="Close"
+              class="rounded p-1 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4"><path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"/></svg>
+      </button>
+    </header>
+
+    <div x-show="error" x-text="error"
+         class="mb-3 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700 ring-1 ring-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:ring-rose-900"
+         role="alert"></div>
+
+    <form @submit.prevent="add()" class="mb-5 flex gap-2">
+      <input type="text" maxlength="60" required placeholder="New category" x-model="newName"
+             class="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:focus:border-slate-500 dark:focus:ring-slate-700">
+      <button type="submit"
+              class="rounded-lg bg-slate-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white">
+        Add
+      </button>
+    </form>
+
+    <ul class="divide-y divide-slate-200 dark:divide-slate-800">
+      <template x-for="c in categories" :key="c.id">
+        <li class="flex items-center gap-2 py-2">
+          <input type="text" :value="c.name" @change="rename(c, $event.target.value)"
+                 class="flex-1 rounded-lg border border-transparent bg-transparent px-2 py-1 text-sm outline-none transition hover:border-slate-200 focus:border-slate-400 focus:ring-2 focus:ring-slate-300 dark:hover:border-slate-700 dark:focus:border-slate-500 dark:focus:ring-slate-700">
+          <button type="button" @click="remove(c)" aria-label="Delete"
+                  class="rounded p-1 text-slate-400 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/50">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4"><path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clip-rule="evenodd"/></svg>
+          </button>
+        </li>
+      </template>
+      <template x-if="!categories.length">
+        <li class="py-4 text-center text-sm text-slate-500 dark:text-slate-400">No categories yet.</li>
+      </template>
+    </ul>
+
+    <p class="mt-6 text-xs text-slate-500 dark:text-slate-400">
+      Deleting a category moves its apps to "Uncategorized".
+    </p>
+  </aside>
+</div>
+{{end}}

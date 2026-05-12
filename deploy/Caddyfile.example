@@ -1,0 +1,29 @@
+# Caddy reverse proxy for dashboard.
+#
+# Replace apps.example.com with your hostname, drop this file at
+# /etc/caddy/Caddyfile, and `systemctl reload caddy`. Caddy provisions and
+# renews Let's Encrypt certs automatically.
+
+apps.example.com {
+    encode gzip zstd
+
+    # Sensible default headers; CSP is set by the app itself.
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options    nosniff
+        Referrer-Policy           strict-origin-when-cross-origin
+    }
+
+    # The app's trusted-proxies setting should include Caddy's IP/CIDR so
+    # X-Forwarded-* is honored. The header dashboard reads is the standard
+    # X-Forwarded-For that reverse_proxy sets automatically.
+    reverse_proxy 127.0.0.1:8080 {
+        # Default Caddy already passes X-Forwarded-For / -Proto / -Host.
+        flush_interval -1
+    }
+
+    log {
+        output file /var/log/caddy/dashboard-access.log
+        format console
+    }
+}

@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  # Cancel in-flight runs on the same branch / PR when a new push arrives.
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22.x"
+          cache: true
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: go test
+        run: go test -race -count=1 ./...
+
+  build:
+    name: build (smoke)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22.x"
+          cache: true
+
+      # The Makefile downloads the Tailwind CLI and vendors JS into web/static
+      # before compiling. This proves the embed paths line up on a fresh clone.
+      - name: make build
+        run: make build
+
+      - name: binary size budget
+        run: |
+          size=$(stat -c%s bin/dashboard)
+          echo "binary is ${size} bytes"
+          # The spec calls for <25MB; warn loudly if we trend toward the limit.
+          if [ "$size" -gt 26214400 ]; then
+            echo "::error::binary exceeds 25 MiB ($size bytes)"
+            exit 1
+          fi

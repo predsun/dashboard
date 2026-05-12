@@ -1,0 +1,30 @@
+# Build artifacts
+/bin/
+/dist/
+*.exe
+*.test
+*.out
+
+# Tailwind output (built artifact, not source)
+/web/static/css/output.css
+
+# Downloaded build tools
+/.tools/
+
+# Runtime data
+/tmp-data/
+/data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Local config overrides
+/config.toml
+/config.local.toml

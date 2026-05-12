@@ -1,0 +1,77 @@
+{{define "title"}}dashboard{{end}}
+
+{{define "content"}}
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8" x-data="dashboardPage()">
+  <header class="mb-8 flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h1 class="text-xl font-semibold tracking-tight sm:text-2xl">{{.Data.Title}}</h1>
+      <p class="text-sm text-slate-500 dark:text-slate-400">{{.Data.AppCount}} app{{if ne .Data.AppCount 1}}s{{end}}</p>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <label class="relative block">
+        <span class="sr-only">Search</span>
+        <input id="search" name="q" type="search" placeholder="Search…  /"
+               @input="filterTiles($event.target.value)"
+               class="w-56 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:focus:border-slate-500 dark:focus:ring-slate-700">
+      </label>
+
+      <button type="button"
+              @click="$dispatch('open-app-editor', { mode: 'create' })"
+              class="inline-flex items-center gap-1 rounded-lg bg-slate-900 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white motion-reduce:transition-none">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4"><path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/></svg>
+        Add app
+      </button>
+
+      <button type="button"
+              @click="$dispatch('open-categories-editor')"
+              aria-label="Manage categories"
+              class="rounded-lg border border-slate-200 bg-white p-2 text-slate-600 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 motion-reduce:transition-none">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4" aria-hidden="true">
+          <path d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+
+      <button type="button" @click="cycleTheme()"
+              :aria-label="'Theme: ' + theme"
+              class="rounded-lg border border-slate-200 bg-white p-2 text-slate-600 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 motion-reduce:transition-none">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4" aria-hidden="true">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+        </svg>
+      </button>
+
+      <form method="post" action="/logout">
+        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+        <button type="submit"
+                class="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 motion-reduce:transition-none">
+          Sign out
+        </button>
+      </form>
+    </div>
+  </header>
+
+  {{range .Data.Groups}}
+    <section class="mb-10" aria-labelledby="cat-{{.ID}}">
+      <h2 id="cat-{{.ID}}" class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+        {{.Name}}
+      </h2>
+      <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8"
+           data-sortable data-category-id="{{.ID}}">
+        {{range .Apps}}
+          {{template "_tile.html" .}}
+        {{end}}
+      </div>
+    </section>
+  {{end}}
+
+  {{if eq .Data.AppCount 0}}
+    <div class="rounded-2xl border-2 border-dashed border-slate-300 p-12 text-center dark:border-slate-700">
+      <p class="text-slate-500 dark:text-slate-400">No apps yet. Click <strong>Add app</strong> to get started.</p>
+    </div>
+  {{end}}
+</div>
+
+{{template "_app_editor.html" .}}
+{{template "_categories_editor.html" .}}
+{{end}}

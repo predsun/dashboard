@@ -1,0 +1,53 @@
+{{define "_tile.html"}}
+<div data-app-id="{{.App.ID}}"
+     data-app-name="{{.App.Name}}"
+     data-app-desc="{{.App.Description}}"
+     data-app-url="{{.App.URL}}"
+     data-app-icon="{{.App.IconPath}}"
+     data-app-category="{{if .App.CategoryID}}{{.App.CategoryID}}{{else}}{{end}}"
+     data-app-hc-enabled="{{if .App.HealthCheckEnabled}}1{{else}}0{{end}}"
+     data-app-hc-url="{{.App.HealthCheckURL}}"
+     class="group relative flex flex-col items-center gap-2 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 transition duration-200 hover:-translate-y-0.5 hover:shadow-md dark:bg-slate-900 dark:ring-slate-800 dark:hover:bg-slate-800/80 motion-reduce:transition-none motion-reduce:hover:translate-y-0">
+
+  <div class="absolute right-1.5 top-1.5 flex gap-0.5 opacity-0 transition-opacity duration-150 group-hover:opacity-100 motion-reduce:transition-none">
+    <button type="button"
+            @click.stop.prevent="$dispatch('open-app-editor', { mode: 'edit', el: $event.target.closest('[data-app-id]') })"
+            aria-label="Edit"
+            class="rounded p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-3.5 w-3.5"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>
+    </button>
+    <button type="button" data-drag-handle
+            aria-label="Drag to reorder"
+            tabindex="-1"
+            class="cursor-grab rounded p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-3.5 w-3.5" aria-hidden="true">
+        <circle cx="9" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/>
+        <circle cx="15" cy="6" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="15" cy="18" r="1.5"/>
+      </svg>
+    </button>
+  </div>
+
+  <a href="{{.App.URL}}" target="_blank" rel="noopener noreferrer"
+     class="flex flex-col items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 rounded-lg">
+    <div class="relative">
+      {{if .App.IconPath}}
+        <img src="{{upload (printf "icons/%s" .App.IconPath)}}" alt=""
+             class="h-12 w-12 rounded-lg object-contain" loading="lazy">
+      {{else}}
+        <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400" aria-hidden="true">
+          <span class="text-lg font-semibold">{{if .App.Name}}{{slice .App.Name 0 1}}{{end}}</span>
+        </div>
+      {{end}}
+      {{if .Status}}
+        <span aria-label="status: {{.Status.Status}}"
+              class="absolute -right-1 -top-1 inline-block h-3 w-3 rounded-full ring-2 ring-white dark:ring-slate-900
+                     {{if eq .Status.Status "up"}}bg-emerald-500{{else if eq .Status.Status "down"}}bg-rose-500{{else}}bg-slate-300 dark:bg-slate-600{{end}}"></span>
+      {{end}}
+    </div>
+    <div class="text-center">
+      <div class="text-sm font-medium leading-tight">{{.App.Name}}</div>
+      {{with .App.Description}}<div class="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{{.}}</div>{{end}}
+    </div>
+  </a>
+</div>
+{{end}}
