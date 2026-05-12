@@ -27,9 +27,10 @@ func newTestWorker(t *testing.T) (*Worker, *sql.DB, func()) {
 	}
 
 	w := NewWorker(conn, slog.New(slog.NewJSONHandler(io.Discard, nil)))
-	// Tighter timings so tests stay snappy.
-	w.Interval = 100 * time.Millisecond
-	w.MaxBackoff = 2 * time.Second
+	// Health timestamps are persisted as Unix seconds, so keep the interval
+	// above one second to make future-watermark assertions deterministic.
+	w.Interval = 2 * time.Second
+	w.MaxBackoff = 10 * time.Second
 	w.Timeout = 200 * time.Millisecond
 	w.buildClient()
 
@@ -185,7 +186,7 @@ func TestDispatchHonorsDueWatermark(t *testing.T) {
 
 	app := mustCreateApp(t, conn, srv.URL)
 
-	// First dispatch — row absent, app is due. After it returns, status=up
+	// First dispatch 鈥?row absent, app is due. After it returns, status=up
 	// and next_check_at is in the future.
 	w.dispatch(context.Background(), nil)
 	// Race-free wait by polling for the row: we have at most 1 in-flight
