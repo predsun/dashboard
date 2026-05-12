@@ -61,8 +61,8 @@ OS="linux"
 # --- Resolve version --------------------------------------------------------
 if [[ "$VERSION" == "latest" ]]; then
   info "resolving latest release for ${REPO}"
-  VERSION="$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" \
-    | grep -m1 '"tag_name"' | sed -E 's/.*"tag_name": *"([^"]+)".*/\1/')"
+  RELEASE_JSON="$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest")"
+  VERSION="$(printf '%s\n' "$RELEASE_JSON" | sed -nE 's/.*"tag_name": *"([^"]+)".*/\1/p')"
   [[ -n "$VERSION" ]] || err "could not resolve latest release"
 fi
 info "installing dashboard ${VERSION} (${OS}/${ARCH})"
@@ -127,6 +127,20 @@ if [[ ! -d "$DATA_DIR" ]]; then
   install -d -m 0750 -o "$USER_NAME" -g "$USER_NAME" "$DATA_DIR"
 else
   info "data dir ${DATA_DIR} already exists; leaving ownership alone"
+fi
+
+# --- Environment ------------------------------------------------------------
+ENV_FILE="/etc/dashboard.env"
+if [[ ! -f "$ENV_FILE" ]]; then
+  info "creating ${ENV_FILE}"
+  cat > "$ENV_FILE" <<EOF
+DASHBOARD_DATA_DIR=${DATA_DIR}
+DASHBOARD_LISTEN_ADDR=:8080
+EOF
+  chmod 600 "$ENV_FILE"
+  chown root:root "$ENV_FILE"
+else
+  info "${ENV_FILE} already exists; leaving overrides alone"
 fi
 
 # --- Binary -----------------------------------------------------------------
