@@ -26,8 +26,9 @@ The script:
 6. Creates a `dashboard` system user (`useradd --system --no-create-home --shell /usr/sbin/nologin`) if absent.
 7. Installs the binary to `/usr/local/bin/dashboard` (root-owned, `0755`).
 8. Creates `/var/lib/dashboard` (`0750`, `dashboard:dashboard`) if absent 鈥?preserves ownership on re-runs.
-9. Installs `/etc/systemd/system/dashboard.service`, runs `daemon-reload`, enables the unit.
-10. Restarts the service if already running.
+9. Creates `/etc/dashboard.env` if absent, pointing the service at the data directory.
+10. Installs `/etc/systemd/system/dashboard.service`, runs `daemon-reload`, enables the unit.
+11. Restarts the service if already running.
 
 ### Install a specific version
 
