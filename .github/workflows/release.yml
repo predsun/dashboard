@@ -93,7 +93,7 @@ jobs:
         working-directory: dist
         run: |
           cosign sign-blob --yes \
-            --output-signature SHA256SUMS.sig \
+            --bundle SHA256SUMS.bundle \
             SHA256SUMS
 
       - name: copy installer + systemd unit into release
@@ -112,6 +112,6 @@ jobs:
             dist/dashboard-linux-arm64 \
             dist/dashboard-darwin-arm64 \
             dist/SHA256SUMS \
-            dist/SHA256SUMS.sig \
+            dist/SHA256SUMS.bundle \
             dist/install.sh \
             dist/dashboard.service
